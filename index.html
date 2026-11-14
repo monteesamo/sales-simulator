@@ -4,33 +4,63 @@
 </style></head><body><main class="wrap"><header><div class="muted">STAFF TRAINING TOOL</div><h1>売上シミュレーター</h1><p class="muted">目標から逆算し、新規集客・再来率・客単価の関係を考えるための研修用ツールです。</p></header>
 <section class="panel"><h2>① 現状と目標</h2><div class="controls" id="basic"></div></section>
 <section class="panel"><h2>② 毎月の条件</h2><div class="controls" id="conditions"></div></section>
-<section class="panel"><h2>③ 売上予測</h2><div class="results"><div class="stat"><small>6ヶ月後の月間売上</small><strong id="m6">—</strong></div><div class="stat"><small>12ヶ月後の月間売上</small><strong id="m12">—</strong></div><div class="stat"><small>12ヶ月後の目標達成率</small><strong id="achievement">—</strong></div></div><div class="bar"><div id="progress" style="width:0"></div></div><p id="gap" class="muted"></p><svg id="chart" class="chart" viewBox="0 0 680 250" role="img" aria-label="月間売上の推移"></svg><div class="legend"><span class="dot"></span>予測売上　<span class="dot orange"></span>目標売上</div></section>
-<section class="panel"><h2>④ 目標から逆算</h2><div class="callout" id="reverse"></div><p class="muted">※ほかの条件を固定し、「毎月の新規客数」だけを変えた場合の必要人数です。</p></section>
-<section class="panel"><h2>⑤ 計算の前提（必ず確認）</h2><p class="footer">新規客は初回来店時に売上を計上し、設定した来店周期の後に「新規再来率」の割合が2回目、そのさらに1周期後に「リピート移行率」の割合が3回目の来店をすると仮定します。3回目以降は同じ周期で再来し、年間失客率に従って徐々に減少します。</p><p class="footer">現在の売上から、新規客と2回目来店客の推定売上を除いた金額を既存リピート客の売上とみなします。過去の新規客数と再来率が現在と同じだったと仮定した推定であり、実際の顧客構成とは異なる場合があります。月間の来店周期が整数でない場合は来店時期を月単位に按分します。各月の数値は期待値であり、実際の人数を表す整数ではありません。</p><p class="footer"><strong>重要：</strong>売上予測は、技術売上・予約枠・スタッフの稼働日数・季節変動・顧客ごとの単価差・実際の再来時期を考慮していません。教育用の試算であり、売上を保証するものではありません。入力した数値は端末内で計算され、外部に送信されません。</p><details><summary>モデルの計算方法を詳しく見る</summary><p class="footer">過去の新規客が一定数で流入していたと仮定して、当月の2回目来店売上を推定します。現在の総来店数から新規客・推定2回目来店客を引いた残りを既存リピート客の月間来店数とみなし、来店周期を掛けて既存顧客プールを推定します。既存顧客は毎月、年間失客率から換算した月次継続率を適用します。新規客の各月の集団（コホート）を個別に追跡し、2回目・3回目以降の来店を計上します。月間売上は各月の総来店期待人数×客単価で求めます。</p></details><button type="button" id="reset">初期条件に戻す</button></section></main>
+<section class="panel"><h2>③ 売上予測</h2><div class="results"><div class="stat"><small id="m6label">6ヶ月後の月間売上</small><strong id="m6">—</strong></div><div class="stat"><small id="m12label">12ヶ月後の月間売上</small><strong id="m12">—</strong></div><div class="stat"><small id="achievementlabel">目標月の達成率</small><strong id="achievement">—</strong></div></div><div class="bar"><div id="progress" style="width:0"></div></div><p id="gap" class="muted"></p><svg id="chart" class="chart" viewBox="0 0 680 250" role="img" aria-label="月間売上の推移"></svg><div class="legend"><span class="dot"></span>予測売上　<span class="dot orange"></span>目標売上</div></section>
+<section class="panel"><h2>④ 今のペースなら何ヶ月？</h2><div class="callout" id="timeToGoal"></div><p class="muted">現在の条件を変えずに、目標月間売上へ初めて到達する時期を試算します。最大120ヶ月まで確認します。</p></section>
+<section class="panel"><h2>⑤ 目標から逆算</h2><div class="callout" id="reverse"></div><p class="muted">※ほかの条件を固定し、「毎月の新規客数」だけを変えた場合の必要人数です。</p></section>
+<section class="panel"><h2>⑥ 計算の前提（必ず確認）</h2><p class="footer">新規客は初回来店時に売上を計上し、設定した来店周期の後に「新規再来率」の割合が2回目、そのさらに1周期後に「リピート移行率」の割合が3回目の来店をすると仮定します。3回目以降は同じ周期で再来し、年間失客率に従って徐々に減少します。</p><p class="footer">現在の売上から、新規客と2回目来店客の推定売上を除いた金額を既存リピート客の売上とみなします。過去の新規客数と再来率が現在と同じだったと仮定した推定であり、実際の顧客構成とは異なる場合があります。来店周期が0.5ヶ月刻みの場合、来店期待数を隣接する月に按分します。各月の数値は期待値であり、実際の人数を表す整数ではありません。</p><p class="footer"><strong>重要：</strong>売上予測は、技術売上・予約枠・スタッフの稼働日数・季節変動・顧客ごとの単価差・実際の再来時期を考慮していません。教育用の試算であり、売上を保証するものではありません。入力した数値は端末内で計算され、外部に送信されません。</p><details><summary>モデルの計算方法を詳しく見る</summary><p class="footer">過去の新規客が一定数で流入していたと仮定して、当月の2回目来店売上を推定します。現在の総来店数から新規客・推定2回目来店客を引いた残りを既存リピート客の月間来店数とみなし、来店周期を掛けて既存顧客プールを推定します。既存顧客は毎月、年間失客率から換算した月次継続率を適用します。新規客の各月の集団（コホート）を個別に追跡し、2回目・3回目以降の来店を計上します。月間売上は各月の総来店期待人数×客単価で求めます。</p></details><button type="button" id="reset">初期条件に戻す</button></section></main>
 <script>
 const defs=[
 {id:'current',label:'現在の月間売上',min:0,max:2000000,step:10000,value:600000,unit:'円',group:'basic'},
-{id:'target',label:'12ヶ月後の目標売上',min:100000,max:2500000,step:10000,value:1000000,unit:'円',group:'basic'},
+{id:'target',label:'目標月間売上',min:100000,max:2500000,step:10000,value:1000000,unit:'円',group:'basic'},
+{id:'horizon',label:'目標達成までの期間',min:1,max:36,step:1,value:12,unit:'ヶ月',group:'basic'},
 {id:'new',label:'毎月の新規客数',min:0,max:50,step:1,value:6,unit:'名',group:'conditions'},
 {id:'price',label:'客単価',min:5000,max:30000,step:500,value:14000,unit:'円',group:'conditions'},
 {id:'r2',label:'新規 → 2回目の再来率',min:0,max:100,step:1,value:45,unit:'%',group:'conditions'},
 {id:'r3',label:'2回目 → 3回目の再来率',min:0,max:100,step:1,value:70,unit:'%',group:'conditions'},
-{id:'cycle',label:'平均来店周期',min:1,max:6,step:1,value:2,unit:'ヶ月',group:'conditions'},
+{id:'cycle',label:'平均来店周期',min:1,max:6,step:0.5,value:2,unit:'ヶ月',group:'conditions'},
 {id:'churn',label:'リピート客の年間失客率',min:0,max:40,step:1,value:5,unit:'%',group:'conditions'}];
 const state=Object.fromEntries(defs.map(d=>[d.id,d.value]));const yen=n=>Math.round(n).toLocaleString('ja-JP')+'円';const man=n=>(n/10000).toLocaleString('ja-JP',{maximumFractionDigits:1})+'万円';
 for(const d of defs){const e=document.createElement('div');e.className='control';e.innerHTML=`<label for="${d.id}"><span>${d.label}</span><output id="out-${d.id}"></output></label><input type="range" id="${d.id}" min="${d.min}" max="${d.max}" step="${d.step}" value="${d.value}"><div class="hint">${d.min.toLocaleString('ja-JP')}${d.unit} ～ ${d.max.toLocaleString('ja-JP')}${d.unit}</div>`;document.getElementById(d.group).appendChild(e);e.querySelector('input').addEventListener('input',ev=>{state[d.id]=Number(ev.target.value);render()});}
-function spreadAt(month,when){return month===when?1:0}
-function simulate(p){const c=p.cycle, rate2=p.r2/100,rate3=p.r3/100, monthlyRet=Math.pow(1-p.churn/100,1/12), totalNow=p.current/p.price;
-// Existing two-visit cohort is approximated using steady historical new-client flow.
-const currentSecond=p.new*rate2;const currentNew=p.new;const currentRepeatVisits=Math.max(0,totalNow-currentNew-currentSecond);let repeatPool=currentRepeatVisits*c;
-const cohorts=[];const sales=[p.current];for(let m=1;m<=12;m++){repeatPool*=monthlyRet;let visits=p.new;for(const cohort of cohorts){const age=m-cohort.month;const second=c;const third=2*c;if(age===second)visits+=cohort.size*rate2;if(age===third){const converted=cohort.size*rate2*rate3;visits+=converted;repeatPool+=converted*c;} }
-// Existing repeat pool already includes newly converted clients, so count only their visit above and avoid double count in pool visits this month.
-const convertedNow=cohorts.reduce((sum,cohort)=>sum+(m-cohort.month===2*c?cohort.size*rate2*rate3:0),0);
-visits+=(repeatPool-convertedNow*c)/c;
-cohorts.push({month:m,size:p.new});sales.push(visits*p.price);}
-return sales;}
-function render(){for(const d of defs)document.getElementById('out-'+d.id).textContent=state[d.id].toLocaleString('ja-JP')+d.unit;const vals=simulate(state),v6=vals[6],v12=vals[12],pct=state.target?100*v12/state.target:0;document.getElementById('m6').textContent=man(v6);document.getElementById('m12').textContent=man(v12);document.getElementById('achievement').textContent=Math.round(pct)+'%';document.getElementById('achievement').className=pct>=100?'good':'bad';document.getElementById('progress').style.width=Math.max(0,Math.min(100,pct))+'%';document.getElementById('gap').textContent=v12>=state.target?'目標を '+man(v12-state.target)+' 上回る試算です。':'目標まであと '+man(state.target-v12)+' 必要です。';
-let needed=null;for(let n=0;n<=200;n++){if(simulate({...state,new:n})[12]>=state.target){needed=n;break;}}document.getElementById('reverse').innerHTML=needed===null?'現在の条件では、新規客を月200名に増やしても目標に届きません。客単価や再来率など、ほかの条件も見直してみましょう。':`ほかの条件を変えない場合、目標達成に必要な毎月の新規客数は <strong style="font-size:25px">${needed}名</strong>（現在より <strong>${needed-state.new>=0?'+':''}${needed-state.new}名/月</strong>）という試算です。`;
-const svg=document.getElementById('chart'),W=680,H=250,left=54,right=15,top=15,bottom=36;const ymax=Math.max(state.target,...vals,100000)*1.12;const X=i=>left+(W-left-right)*i/12,Y=v=>top+(H-top-bottom)*(1-v/ymax);let out='';for(let k=0;k<=4;k++){let v=ymax*k/4,y=Y(v);out+=`<line class="grid" x1="${left}" y1="${y}" x2="${W-right}" y2="${y}"/><text x="${left-8}" y="${y+4}" text-anchor="end">${Math.round(v/10000)}万</text>`}for(let m of [0,3,6,9,12])out+=`<text x="${X(m)}" y="${H-11}" text-anchor="middle">${m}ヶ月</text>`;out+=`<line class="goal" x1="${left}" y1="${Y(state.target)}" x2="${W-right}" y2="${Y(state.target)}"/><polyline class="line" points="${vals.map((v,i)=>X(i)+','+Y(v)).join(' ')}"/>`;svg.innerHTML=out;}
+// Add a fractional visit to the two neighboring calendar months, preserving its total weight.
+function addVisit(bucket, month, count){if(month<1 || month>bucket.length-1 || count<=0)return;const lo=Math.floor(month), frac=month-lo;if(lo>=1 && lo<bucket.length)bucket[lo]+=count*(1-frac);if(frac>0 && lo+1<bucket.length)bucket[lo+1]+=count*frac;}
+function simulate(p, months=120){
+ const cycle=p.cycle,r2=p.r2/100,r3=p.r3/100,ret=Math.pow(1-p.churn/100,1/12), totalNow=p.current/p.price;
+ // Approximate current 2nd-visit volume from historical steady inflow.
+ const secondNow=p.new*r2;
+ const existingMonthly=Math.max(0,totalNow-p.new-secondNow);
+ // Existing third-and-later repeat visits decay with retention.
+ const existingPool=existingMonthly*cycle;
+ const visits=Array(months+1).fill(0);const sales=Array(months+1).fill(0);sales[0]=p.current;
+ for(let m=1;m<=months;m++)visits[m]+=existingPool*Math.pow(ret,m)/cycle;
+ // Assume new customers arrive every month. Track each monthly cohort independently.
+ // Each cohort makes its first visit, may make its second and third, and then repeat.
+ for(let start=1;start<=months;start++){
+   visits[start]+=p.new;
+   addVisit(visits,start+cycle,p.new*r2);
+   const established=p.new*r2*r3;
+   for(let visitTime=start+2*cycle, k=0;visitTime<=months+0.001;visitTime+=cycle,k++){
+     // Loss starts after the third visit, not before it.
+     addVisit(visits,visitTime,established*Math.pow(ret,k*cycle));
+   }
+ }
+ for(let m=1;m<=months;m++)sales[m]=visits[m]*p.price;
+ return sales;
+}
+function render(){
+ for(const d of defs)document.getElementById('out-'+d.id).textContent=state[d.id].toLocaleString('ja-JP')+d.unit;
+ const h=state.horizon, vals=simulate(state,120),mid=Math.max(1,Math.round(h/2)),goalVal=vals[h],pct=state.target?100*goalVal/state.target:0;
+ document.getElementById('m6label').textContent=mid+'ヶ月後の月間売上';document.getElementById('m12label').textContent=h+'ヶ月後の月間売上';document.getElementById('achievementlabel').textContent=h+'ヶ月後の目標達成率';
+ document.getElementById('m6').textContent=man(vals[mid]);document.getElementById('m12').textContent=man(goalVal);document.getElementById('achievement').textContent=Math.round(pct)+'%';
+ document.getElementById('achievement').className=pct>=100?'good':'bad';document.getElementById('progress').style.width=Math.max(0,Math.min(100,pct))+'%';
+ document.getElementById('gap').textContent=goalVal>=state.target?'目標を '+man(goalVal-state.target)+' 上回る試算です。':'目標まであと '+man(state.target-goalVal)+' 必要です。';
+ const first=state.current>=state.target?0:vals.findIndex((v,i)=>i>0 && v>=state.target);
+ document.getElementById('timeToGoal').innerHTML=first===0?'現在すでに目標月商に到達しています。':first>0?`現在の条件のままなら、最初に目標月商へ到達するのは <strong style="font-size:25px">${first}ヶ月後</strong> という試算です。`:'現在の条件では、120ヶ月以内に目標月商へ到達しない試算です。新規客数・客単価・再来率などを見直してみましょう。';
+ let needed=null;for(let n=0;n<=200;n++){if(simulate({...state,new:n},h)[h]>=state.target){needed=n;break;}}
+ document.getElementById('reverse').innerHTML=needed===null?`${h}ヶ月後の目標達成には、新規客を月200名に増やしても届かない試算です。ほかの条件も見直してみましょう。`:`${h}ヶ月後の目標達成に必要な毎月の新規客数は <strong style="font-size:25px">${needed}名</strong>（現在より <strong>${needed-state.new>=0?'+':''}${needed-state.new}名/月</strong>）という試算です。`;
+ const svg=document.getElementById('chart'),W=680,H=250,left=54,right=15,top=15,bottom=36;const displayed=vals.slice(0,h+1);const ymax=Math.max(state.target,...displayed,100000)*1.12;const X=i=>left+(W-left-right)*i/h,Y=v=>top+(H-top-bottom)*(1-v/ymax);let out='';
+ for(let k=0;k<=4;k++){let v=ymax*k/4,y=Y(v);out+=`<line class="grid" x1="${left}" y1="${y}" x2="${W-right}" y2="${y}"/><text x="${left-8}" y="${y+4}" text-anchor="end">${Math.round(v/10000)}万</text>`;}
+ const ticks=[...new Set([0,Math.round(h/4),Math.round(h/2),Math.round(3*h/4),h])];for(let m of ticks)out+=`<text x="${X(m)}" y="${H-11}" text-anchor="middle">${m}ヶ月</text>`;
+ out+=`<line class="goal" x1="${left}" y1="${Y(state.target)}" x2="${W-right}" y2="${Y(state.target)}"/><polyline class="line" points="${displayed.map((v,i)=>X(i)+','+Y(v)).join(' ')}"/>`;svg.innerHTML=out;
+}
 document.getElementById('reset').addEventListener('click',()=>{for(const d of defs){state[d.id]=d.value;document.getElementById(d.id).value=d.value;}render()});render();
 </script></body></html>
